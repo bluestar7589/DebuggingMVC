@@ -15,7 +15,11 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Product.ToListAsync());
+            List<Product> lstProduct = await _context.Product.ToListAsync();
+            if (lstProduct.Count == 0) {
+                ViewData["Message"] = "There is nothing on the list.";
+            }
+            return View(lstProduct);
         }
 
         public IActionResult Create()
@@ -28,7 +32,8 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _context.AddAsync(product);
+                _context.Add(product);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -75,6 +80,7 @@ namespace CPW219_AspnetMVC_CRUD_Debugging.Controllers
         {
             var product = await _context.Product.FindAsync(id);
             _context.Product.Remove(product);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
